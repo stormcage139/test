@@ -8,15 +8,20 @@ bot = telebot.TeleBot("7330806602:AAFrWTvYcEaFXeX8eNBQjEqXVPwGjF5kRZY")
 @bot.message_handler(commands=["start"])
 def start_button(message):
     markup = types.ReplyKeyboardMarkup()
-    btn = types.KeyboardButton("КУЛИТИ")
+    btn = types.KeyboardButton("Исходный код бота")
+    btn1 = types.KeyboardButton("Элемент гайда по которому сделаны кнопки")
     markup.row(btn)
-    bot.send_message(message.chat.id, "КУ", reply_markup=markup)
+    markup.row(btn1)
+    bot.send_message(message.chat.id, "Что вас интересует?", reply_markup=markup)
     bot.register_next_step_handler(message, onclick)
 
 
 def onclick(message):
-    if message.text.lower() == "кулити":
-        bot.send_message(message.chat.id, "АГА")
+    if message.text.lower() == "исходный код бота":
+        webbrowser.open("https://github.com/stormcage139/test/blob/master/test1.py")
+    elif message.text == "Элемент гайда по которому сделаны кнопки":
+        webbrowser.open("https://youtu.be/RpiWnPNTeww?si=cY81QoEYM6rpc1b4&t=996")
+    bot.register_next_step_handler(message, onclick)
 
 
 @bot.message_handler(commands=["site"])
