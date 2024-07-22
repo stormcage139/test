@@ -8,4 +8,4 @@ def start(message):
     bot.send_message(message.chat.id, "Привет")
 
 
-bot.polling(non_stop=True)
+bot.infinity_polling()
