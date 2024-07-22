@@ -27,15 +27,36 @@ def start_button(message):
     bot.send_photo(message.chat.id, tony_stark)
     bot.send_message(message.chat.id, "Данный бот создан для изучение библиотеки telebot,так что скудный "
                                       "функцинал прошу не осуждать", reply_markup=markup)
-    # bot.register_next_step_handler(message, onclick)
+    bot.register_next_step_handler(message, user_into_database)
 
 
-def onclick(message):
-    if message.text.lower() == "исходный код бота":
-        webbrowser.open("https://github.com/stormcage139/test/blob/master/test1.py")
-    elif message.text == "Элемент гайда по которому сделаны кнопки":
-        webbrowser.open("https://youtu.be/RpiWnPNTeww?si=cY81QoEYM6rpc1b4&t=996")
-    bot.register_next_step_handler(message, onclick)
+def user_into_database(message):
+    name = message.text.strip()
+    bot.send_message(message.chat.id, "Для продолжения введи пароль")
+    bot.register_next_step_handler(message, user_pass, name)
+
+
+def user_pass(message, name):
+    password = message.text.strip()
+    conn = sqlite3.connect("storm_bot.sql")
+    cur = conn.cursor()
+
+    cur.execute(f"INSERT INTO users (name, pass VALUES ({name}, {password}")
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton("Список пользователей", callback_data="users"))
+    bot.send_message(message.chat.id, "Пользователь зарегестрирован", reply_markup=markup)
+
+
+# def onclick(message):
+#     if message.text.lower() == "исходный код бота":
+#         webbrowser.open("https://github.com/stormcage139/test/blob/master/test1.py")
+#     elif message.text == "Элемент гайда по которому сделаны кнопки":
+#         webbrowser.open("https://youtu.be/RpiWnPNTeww?si=cY81QoEYM6rpc1b4&t=996")
+#     bot.register_next_step_handler(message, onclick)
 
 
 @bot.message_handler(commands=["hello"])
