@@ -1,4 +1,5 @@
 import telebot
+from telebot import types
 import webbrowser
 
 bot = telebot.TeleBot("7330806602:AAFrWTvYcEaFXeX8eNBQjEqXVPwGjF5kRZY")
@@ -19,13 +20,25 @@ def qqq(message):
     bot.send_message(message.chat.id, message)
 
 
+@bot.message_handler(commands=["test"])
+def test(message):
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton("Вам выдан доступ на сайт с кодом",
+                                          url="https://github.com/stormcage139/test/blob/master/test1.py"))
+    bot.send_message(message.chat.id, "Ку",reply_markup=markup)
+
+
+
 @bot.message_handler(commands=["auto"])
-def qqq(message):
+def signin(message):
     bot.send_message(message.chat.id, "Скинь фото")
 
     @bot.message_handler(content_types=["photo"])
-    def photocheck(message):
-        bot.reply_to(message, "Авторизирован")
+    def photocheck(message2):
+        markup = types.InlineKeyboardMarkup()
+        markup.add(types.InlineKeyboardButton("Вам выдан доступ на сайт с кодом",
+                                              url="https://github.com/stormcage139/test/blob/master/test1.py"))
+        bot.reply_to(message2, "ЛЕХЕНДА", reply_markup=markup)
 
 
 bot.infinity_polling()
