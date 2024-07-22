@@ -1,12 +1,22 @@
 import telebot
 from telebot import types
 import webbrowser
+import sqlite3
 
 bot = telebot.TeleBot("7330806602:AAFrWTvYcEaFXeX8eNBQjEqXVPwGjF5kRZY")
 
 
 @bot.message_handler(commands=["start"])
 def start_button(message):
+    conn = sqlite3.connect("storm_bot.sql")
+    cur = conn.cursor()
+
+    cur.execute(
+        'CREATE TABLE IF NOT EXISTS users (id int auto_increment primary key, name varchar(50), pass varchar(50)')
+    conn.commit()
+    cur.close()
+    conn.close()
+
     tony_stark = open("./1.jpg", "rb")
     markup = types.InlineKeyboardMarkup()
     btn = types.InlineKeyboardButton("Исходный код бота",
