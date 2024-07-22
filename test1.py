@@ -27,10 +27,11 @@ def start_button(message):
     bot.send_photo(message.chat.id, tony_stark)
     bot.send_message(message.chat.id, "Данный бот создан для изучение библиотеки telebot,так что скудный "
                                       "функцинал прошу не осуждать", reply_markup=markup)
-    bot.register_next_step_handler(message, user_into_database)
+    bot.send_message(message.chat.id,"Для продолжения авторизируйтесь или зарегестрируйтесь")
+    bot.register_next_step_handler(message, user_name)
 
 
-def user_into_database(message):
+def user_name(message):
     name = message.text.strip()
     bot.send_message(message.chat.id, "Для продолжения введи пароль")
     bot.register_next_step_handler(message, user_pass, name)
@@ -41,7 +42,7 @@ def user_pass(message, name):
     conn = sqlite3.connect("storm_bot.sql")
     cur = conn.cursor()
 
-    cur.execute(f"INSERT INTO users (name, pass VALUES ({name}, {password}")
+    cur.execute(f'INSERT INTO users (name, pass) VALUES ("{name}", "{password}")')
     conn.commit()
     cur.close()
     conn.close()
