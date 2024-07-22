@@ -27,7 +27,7 @@ def start_button(message):
     bot.send_photo(message.chat.id, tony_stark)
     bot.send_message(message.chat.id, "Данный бот создан для изучение библиотеки telebot,так что скудный "
                                       "функцинал прошу не осуждать", reply_markup=markup)
-    bot.send_message(message.chat.id,"Для продолжения авторизируйтесь или зарегестрируйтесь")
+    bot.send_message(message.chat.id, "Для продолжения авторизируйтесь или зарегестрируйтесь")
     bot.register_next_step_handler(message, user_name)
 
 
@@ -50,6 +50,22 @@ def user_pass(message, name):
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton("Список пользователей", callback_data="users"))
     bot.send_message(message.chat.id, "Пользователь зарегестрирован", reply_markup=markup)
+
+
+@bot.callback_query_handler(func=lambda call: True)
+def users_list(call):
+    conn = sqlite3.connect("storm_bot.sql")
+    cur = conn.cursor()
+
+    cur.execute('SELECT * from users')
+    users = cur.fetchall()
+    info = ""
+    for el in users:
+        info += f'Имя: {el[1]}, пароль: {el[2]}\n'
+    cur.close()
+    conn.close()
+
+    bot.send_message(call.message.chat.id, info)
 
 
 # def onclick(message):
