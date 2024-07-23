@@ -16,7 +16,7 @@ def start_button(message):
     conn.commit()
     cur.close()
     conn.close()
-
+    # Создание sqlite базы данных
     tony_stark = open("./1.jpg", "rb")
     markup = types.InlineKeyboardMarkup()
     btn = types.InlineKeyboardButton("Исходный код бота",
@@ -35,6 +35,7 @@ def user_name(message):
     name = message.text.strip()
     bot.send_message(message.chat.id, "Для продолжения введи пароль")
     bot.register_next_step_handler(message, user_pass, name)
+#     вся функция посвящена получению имени пользователя,потом перенаправляет на функцию получения пароля
 
 
 def user_pass(message, name):
@@ -50,6 +51,7 @@ def user_pass(message, name):
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton("Список пользователей", callback_data="users"))
     bot.send_message(message.chat.id, "Пользователь зарегестрирован", reply_markup=markup)
+#     функция запрашивает пароль,вызвает базу данных,добавляет данные в базу
 
 
 @bot.callback_query_handler(func=lambda call: True)
