@@ -66,9 +66,23 @@ def reg_user_pass(message, name):
 #     функция запрашивает пароль,вызвает базу данных,добавляет данные в базу
 
 @bot.message_handler(commands=["Авторизация"])
-def register(message):
+def signin(message):
     bot.send_message(message.chat.id, "Для продолжения введи Имя Пользователя")
-    bot.register_next_step_handler(message, reg_user_name)
+    bot.register_next_step_handler(message, signin_step2)
+
+
+def signin_step2(message):
+    conn = sqlite3.connect("storm_bot.sql")
+    cur = conn.cursor()
+
+    cur.execute('SELECT * from users')
+    users = cur.fetchall()
+    info = ""
+    for el in users:
+        info += f'{el[1]} {el[2]}\n'
+    cur.close()
+    conn.close()
+    bot.send_message(message.chat.id, info)
 
 
 @bot.callback_query_handler(func=lambda call: True)
