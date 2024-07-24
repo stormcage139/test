@@ -19,26 +19,36 @@ def start_button(message):
     # Создание sqlite базы данных
     tony_stark = open("./1.jpg", "rb")
     markup = types.InlineKeyboardMarkup()
+    markup2 = types.ReplyKeyboardMarkup()
     btn = types.InlineKeyboardButton("Исходный код бота",
                                      url="https://github.com/stormcage139/test/blob/master/test1.py")
     btn1 = types.InlineKeyboardButton("Элемент гайда по которому сделаны кнопки",
                                       url="https://youtu.be/RpiWnPNTeww?si=cY81QoEYM6rpc1b4&t=996")
+    btn2 = types.KeyboardButton("/Регистрация")
+    btn3 = types.KeyboardButton("/Авторизация")
     markup.row(btn, btn1)
-    bot.send_photo(message.chat.id, tony_stark)
+    markup2.row(btn2, btn3)
+    bot.send_photo(message.chat.id, tony_stark, reply_markup=markup)
     bot.send_message(message.chat.id, "Данный бот создан для изучение библиотеки telebot,так что скудный "
-                                      "функцинал прошу не осуждать", reply_markup=markup)
-    bot.send_message(message.chat.id, "Для продолжения авторизируйтесь или зарегестрируйтесь")
-    bot.register_next_step_handler(message, user_name)
+                                      "функцинал прошу не осуждать", reply_markup=markup2)
 
 
-def user_name(message):
+@bot.message_handler(commands=["Регистрация"])
+def register(message):
+    bot.send_message(message.chat.id, "Для продолжения введи Имя Пользователя")
+    bot.register_next_step_handler(message, reg_user_name)
+
+
+def reg_user_name(message):
     name = message.text.strip()
     bot.send_message(message.chat.id, "Для продолжения введи пароль")
-    bot.register_next_step_handler(message, user_pass, name)
+    bot.register_next_step_handler(message, reg_user_pass, name)
+
+
 #     вся функция посвящена получению имени пользователя,потом перенаправляет на функцию получения пароля
 
 
-def user_pass(message, name):
+def reg_user_pass(message, name):
     password = message.text.strip()
     conn = sqlite3.connect("storm_bot.sql")
     cur = conn.cursor()
@@ -51,23 +61,29 @@ def user_pass(message, name):
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton("Список пользователей", callback_data="users"))
     bot.send_message(message.chat.id, "Пользователь зарегестрирован", reply_markup=markup)
+
+
 #     функция запрашивает пароль,вызвает базу данных,добавляет данные в базу
 
-
+@bot.message_handler(commands=["Авторизация"])
+def register(message):
+    bot.send_message(message.chat.id, "Для продолжения введи Имя Пользователя")
+    bot.register_next_step_handler(message, reg_user_name)
 @bot.callback_query_handler(func=lambda call: True)
 def users_list(call):
-    conn = sqlite3.connect("storm_bot.sql")
-    cur = conn.cursor()
+    if call.data == "users":
+        conn = sqlite3.connect("storm_bot.sql")
+        cur = conn.cursor()
 
-    cur.execute('SELECT * from users')
-    users = cur.fetchall()
-    info = ""
-    for el in users:
-        info += f'Имя: {el[1]}, пароль: {el[2]}\n'
-    cur.close()
-    conn.close()
+        cur.execute('SELECT * from users')
+        users = cur.fetchall()
+        info = ""
+        for el in users:
+            info += f'Имя: {el[1]}, пароль: {el[2]}\n'
+        cur.close()
+        conn.close()
 
-    bot.send_message(call.message.chat.id, info)
+        bot.send_message(call.message.chat.id, info)
 
 
 # def onclick(message):
