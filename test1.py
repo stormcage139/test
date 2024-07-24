@@ -104,7 +104,7 @@ def qqq(message):
 # @bot.callback_query_handler(func=lambda callback: True)
 # def callback_mess(callback):
 #     if callback.data == "LOL":
-#         bot.delete_message(callback.message.chat.id, callback.message.message_id - 1)
+#         bot.delete_message(callback.message.chat.id, callback.message.message_id - 1) qqe
 
 
 bot.infinity_polling()
