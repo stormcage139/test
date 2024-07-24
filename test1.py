@@ -72,6 +72,8 @@ def signin(message):
 
 
 def signin_step2(message):
+    flag = False
+    user_say = message.text
     conn = sqlite3.connect("storm_bot.sql")
     cur = conn.cursor()
 
@@ -79,10 +81,30 @@ def signin_step2(message):
     users = cur.fetchall()
     info = ""
     for el in users:
-        info += f'{el[1]} {el[2]}\n'
+        if el[1] == user_say:
+            flag = True
+            bot.send_message(message.chat.id, "Введите Пароль")
+            break
     cur.close()
     conn.close()
-    bot.send_message(message.chat.id, info)
+    if flag:
+        bot.register_next_step_handler(message, signin_step3)
+
+
+def signin_step3(message):
+    user_say = message.text
+    conn = sqlite3.connect("storm_bot.sql")
+    cur = conn.cursor()
+
+    cur.execute('SELECT * from users')
+    users = cur.fetchall()
+    info = ""
+    for el in users:
+        if el[2] == user_say:
+            bot.send_message(message.chat.id, "Вы авторизованы")
+            break
+    cur.close()
+    conn.close()
 
 
 @bot.callback_query_handler(func=lambda call: True)
