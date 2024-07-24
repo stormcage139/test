@@ -69,6 +69,8 @@ def reg_user_pass(message, name):
 def register(message):
     bot.send_message(message.chat.id, "Для продолжения введи Имя Пользователя")
     bot.register_next_step_handler(message, reg_user_name)
+
+
 @bot.callback_query_handler(func=lambda call: True)
 def users_list(call):
     if call.data == "users":
