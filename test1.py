@@ -88,17 +88,17 @@ def qqq(message):
     bot.send_message(message.chat.id, message)
 
 
-@bot.message_handler(commands=["auto"])
-def signin(message):
-    bot.send_message(message.chat.id, "Скинь фото")
-
-    @bot.message_handler(content_types=["photo"])
-    def photocheck(message2):
-        markup = types.InlineKeyboardMarkup()
-        btn1 = types.InlineKeyboardButton("Вам выдан доступ на сайт с кодом",
-                                          url="https://github.com/stormcage139/test/blob/master/test1.py")
-        markup.row(btn1)
-        bot.reply_to(message2, "ЛЕХЕНДА", reply_markup=markup)
+# @bot.message_handler(commands=["auto"])
+# def signin(message):
+#     bot.send_message(message.chat.id, "Скинь фото")
+#
+#     @bot.message_handler(content_types=["photo"])
+#     def photocheck(message2):
+#         markup = types.InlineKeyboardMarkup()
+#         btn1 = types.InlineKeyboardButton("Вам выдан доступ на сайт с кодом",
+#                                           url="https://github.com/stormcage139/test/blob/master/test1.py")
+#         markup.row(btn1)
+#         bot.reply_to(message2, "ЛЕХЕНДА", reply_markup=markup)
 
 
 # @bot.callback_query_handler(func=lambda callback: True)
