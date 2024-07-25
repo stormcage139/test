@@ -2,12 +2,31 @@ import telebot
 from telebot import types
 import webbrowser
 import sqlite3
+import requests, json
+from bs4 import BeautifulSoup as BS
 
 bot = telebot.TeleBot("7330806602:AAFrWTvYcEaFXeX8eNBQjEqXVPwGjF5kRZY")
+weather_api = "9f09b90a765e2eb2b66de333e081e988"
+
+url = "https://rp5.ru/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%9A%D0%B0%D0%BB%D1%83%D0%B3%D0%B5,_%D0%9A%D0%B0%D0%BB%D1%83%D0%B6%D1%81%D0%BA%D0%B0%D1%8F_%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C"
+class_ = 'ArchiveTemp'
+
+r = requests.get(url)
+html = BS(r.text, 'html.parser')
+t = html.find(class_='ArchiveTemp').find(class_='t_0').text
 
 authorized = False
 admin_mode = False
 admin_secure = ["admin", "123"]
+
+
+def authorized_error(message):
+    markup = types.ReplyKeyboardMarkup()
+    btn1 = types.KeyboardButton("/Авторизация")
+    btn2 = types.KeyboardButton("/Регистрация")
+    markup.row(btn1, btn2)
+    bot.send_message(message.chat.id, f"Авторизируйтесь путем написания /Авторизация или нажмите на кнопку",
+                     reply_markup=markup)
 
 
 @bot.message_handler(commands=["start"])
@@ -134,37 +153,54 @@ def admin_author_step2(*args):
 def admin_author_last(*info):
     message = info[0]
     admin_name = info[1]
+    global authorized
     global admin_secure
     global admin_mode
     if message.text == admin_secure[1] and admin_name == admin_secure[2]:
         bot.send_message(message.chat.id, "Вы в режиме администратора")
         admin_mode = True
+        authorized = True
 
 
-# def onclick(message):
-#     if message.text.lower() == "исходный код бота":
-#         webbrowser.open("https://github.com/stormcage139/test/blob/master/test1.py")
-#     elif message.text == "Элемент гайда по которому сделаны кнопки":
-#         webbrowser.open("https://youtu.be/RpiWnPNTeww?si=cY81QoEYM6rpc1b4&t=996")
-#     bot.register_next_step_handler(message, onclick)
+@bot.message_handler(commands=["калуга"])
+def kaluga_weather(message):
+    global t
+    bot.reply_to(message, f'Сейчас температура: {t}')
 
 
-# @bot.message_handler(commands=["hello"])
-# def start(message):
-#     if authorized:
-#         bot.send_message(message.chat.id, f"Привет, {message.from_user.last_name} {message.from_user.first_name}")
-#     else:
-#         markup = types.ReplyKeyboardMarkup()
-#         btn1 = types.KeyboardButton("/Авторизация")
-#         btn2 = types.KeyboardButton("/Регистрация")
-#         markup.row(btn1, btn2)
-#         bot.send_message(message.chat.id, f"Авторизируйтесь путем написания /Авторизация или нажмите на кнопку",
-#                          reply_markup=markup)
+@bot.message_handler(commands=["weather"])
+def weather_start(message):
+    if authorized:
+        bot.send_message(message.chat.id, "Напиши название города в котором хочешь узнать погоду")
+        bot.register_next_step_handler(message, weather_end)
+    else:
+        authorized_error(message)
 
 
-# @bot.message_handler(commands=["user"])
-# def qqq(message):
-#     bot.send_message(message.chat.id, message)
+def weather_end(message):
+    city = message.text.strip().lower()
+    weather_city = requests.get(
+        f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={weather_api}&units=metric")
+    if weather_city.status_code == 200:
+        temperature = json.loads(weather_city.text)
+        bot.reply_to(message, f'Сейчас температура: {temperature["main"]["temp"]}')
+    else:
+        bot.reply_to(message, f'Неверно введен город, повторите попытку')
+        bot.register_next_step_handler(message, weather_end)
+
+
+@bot.message_handler(commands=["hello"])
+def start(message):
+    if authorized:
+        bot.send_message(message.chat.id, f"Привет, {message.from_user.last_name} {message.from_user.first_name}")
+    else:
+        authorized_error(message)
+
+
+@bot.message_handler(commands=["a"])
+def start_button(message):
+    global authorized
+    authorized = True
 
 
 # @bot.message_handler(commands=["auto"])
@@ -184,6 +220,10 @@ def admin_author_last(*info):
 # def callback_mess(callback):
 #     if callback.data == "LOL":
 #         bot.delete_message(callback.message.chat.id, callback.message.message_id - 1) qqe
+
+@bot.message_handler()
+def otvet(message):
+    bot.send_message(message.chat.id, "Ебало завали,распизделась хуета")
 
 
 bot.infinity_polling()
