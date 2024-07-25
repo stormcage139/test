@@ -52,11 +52,15 @@ def start_button(message):
                                      url="https://github.com/stormcage139/test/blob/master/test1.py")
     btn1 = types.InlineKeyboardButton("Элемент гайда по которому сделаны кнопки",
                                       url="https://youtu.be/RpiWnPNTeww?si=cY81QoEYM6rpc1b4&t=996")
+    btn_sign = types.InlineKeyboardButton("Авторизация", callback_data="signin")
+    btn_register = types.InlineKeyboardButton("Регистрация", callback_data="signup")
     # Создание кнопок для внедрения в маркап под сообщением
     btn2 = types.KeyboardButton("/Регистрация")
     btn3 = types.KeyboardButton("/Авторизация")
     btn4 = types.KeyboardButton("/AdminPanel")
+
     markup.row(btn, btn1)
+    markup.row(btn_sign, btn_register)
     markup2.row(btn2, btn3)
     markup2.row(btn4)
     bot.send_photo(message.chat.id, tony_stark, reply_markup=markup2)
@@ -95,7 +99,7 @@ def reg_user_pass(message, name):
     conn.close()
 
     markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton("Список пользователей", callback_data="users"))
+    markup.add(types.InlineKeyboardButton("Теперь войдите в аккаунт", callback_data="signin"))
     bot.send_message(message.chat.id, "Пользователь зарегестрирован", reply_markup=markup)
 
 
@@ -147,6 +151,10 @@ def users_list(call):
         bot.send_message(call.message.chat.id, info)
     elif call.data == "qwe":
         admin_author_step1(call.message)
+    elif call.data == "signin":
+        signin(call.message)
+    elif call.data == "signup":
+        register(call.message)
 
 
 @bot.message_handler(commands=["AdminPanel"])
@@ -215,7 +223,9 @@ def start(message):
 @bot.message_handler(commands=["a"])
 def start_button(message):
     global authorized
+    global admin_mode
     authorized = True
+    admin_mode = True
 
 
 # @bot.message_handler(commands=["auto"])
