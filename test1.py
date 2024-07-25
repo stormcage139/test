@@ -5,15 +5,16 @@ import sqlite3
 import requests, json
 from bs4 import BeautifulSoup as BS
 
-bot = telebot.TeleBot("7330806602:AAFrWTvYcEaFXeX8eNBQjEqXVPwGjF5kRZY")
+# Use your telegtrambotAPI
+bot_api = open("telebotapi").readline()
+bot = telebot.TeleBot(bot_api)
 weather_api = "9f09b90a765e2eb2b66de333e081e988"
 
 url = "https://rp5.ru/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%9A%D0%B0%D0%BB%D1%83%D0%B3%D0%B5,_%D0%9A%D0%B0%D0%BB%D1%83%D0%B6%D1%81%D0%BA%D0%B0%D1%8F_%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C"
-class_ = 'ArchiveTemp'
-
 r = requests.get(url)
 html = BS(r.text, 'html.parser')
-t = html.find(class_='ArchiveTemp').find(class_='t_0').text
+t1 = html.find(class_='round-5').find(id='forecastShort-content').text
+t = t1.split(",")
 
 authorized = False
 admin_mode = False
@@ -188,7 +189,16 @@ def admin_author_last(*info):
 @bot.message_handler(commands=["калуга"])
 def kaluga_weather(message):
     global t
-    bot.reply_to(message, f'Сейчас температура: {t}')
+    r = requests.get("https://rp5.ru/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%9A%D0%B0%D0%BB%D1%83%D0%B3%D0%B5,"
+                     "_%D0%9A%D0%B0%D0%BB%D1%83%D0%B6%D1%81%D0%BA%D0%B0%D1%8F_%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%"
+                     "82%D1%8C")
+    html = BS(r.text, 'html.parser')
+    t1 = html.find(class_='round-5').find(id='forecastShort-content').text
+    t = t1.split(",")
+    t[0] = t[0].replace("..", " - ")
+    t[3] = t[3].replace("..", " - ")
+    a = f"{t[0][:-2]} , {t[2]} , {t[3][:-2]} , {t[5]} , {t[6]}"
+    bot.reply_to(message, f'{a}')
 
 
 @bot.message_handler(commands=["weather"])
