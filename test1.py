@@ -18,6 +18,7 @@ t = html.find(class_='ArchiveTemp').find(class_='t_0').text
 authorized = False
 admin_mode = False
 admin_secure = ["admin", "123"]
+last_start_usage = 0
 
 
 def authorized_error(message):
@@ -32,6 +33,8 @@ def authorized_error(message):
 
 @bot.message_handler(commands=["start"])
 def start_button(message):
+    global authorized
+    global admin_mode
     conn = sqlite3.connect("storm_bot.sql")
     cur = conn.cursor()
 
@@ -56,10 +59,14 @@ def start_button(message):
     markup.row(btn, btn1)
     markup2.row(btn2, btn3)
     markup2.row(btn4)
-    bot.send_photo(message.chat.id, tony_stark, reply_markup=markup)
+    bot.send_photo(message.chat.id, tony_stark, reply_markup=markup2)
 
-    bot.send_message(message.chat.id, "Данный бот создан для изучение библиотеки telebot,так что скудный "
-                                      "функцинал прошу не осуждать", reply_markup=markup2)
+    bot.send_message(message.chat.id, f"Данный бот создан для изучение библиотеки telebot,так что скудный "
+                                      "функцинал прошу не "
+                                      f"осуждать\nАвтори"
+                                      f"зирован - {'да' if authorized else 'нет'}\nРежим "
+                                      f"Админа - {'да' if admin_mode else 'нет'}",
+                     reply_markup=markup)
 
 
 @bot.message_handler(commands=["Регистрация"])
