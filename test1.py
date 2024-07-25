@@ -24,6 +24,7 @@ def authorized_error(message):
     markup = types.ReplyKeyboardMarkup()
     btn1 = types.KeyboardButton("/Авторизация")
     btn2 = types.KeyboardButton("/Регистрация")
+    # Кнопки Панели(не чата)
     markup.row(btn1, btn2)
     bot.send_message(message.chat.id, f"Авторизируйтесь путем написания /Авторизация или нажмите на кнопку",
                      reply_markup=markup)
@@ -42,11 +43,13 @@ def start_button(message):
     # Создание sqlite базы данных
     tony_stark = open("./1.jpg", "rb")
     markup = types.InlineKeyboardMarkup()
+    # Маркап кнопок под сообщ
     markup2 = types.ReplyKeyboardMarkup()
     btn = types.InlineKeyboardButton("Исходный код бота",
                                      url="https://github.com/stormcage139/test/blob/master/test1.py")
     btn1 = types.InlineKeyboardButton("Элемент гайда по которому сделаны кнопки",
                                       url="https://youtu.be/RpiWnPNTeww?si=cY81QoEYM6rpc1b4&t=996")
+    # Создание кнопок для внедрения в маркап под сообщением
     btn2 = types.KeyboardButton("/Регистрация")
     btn3 = types.KeyboardButton("/Авторизация")
     btn4 = types.KeyboardButton("/AdminPanel")
@@ -54,6 +57,7 @@ def start_button(message):
     markup2.row(btn2, btn3)
     markup2.row(btn4)
     bot.send_photo(message.chat.id, tony_stark, reply_markup=markup)
+
     bot.send_message(message.chat.id, "Данный бот создан для изучение библиотеки telebot,так что скудный "
                                       "функцинал прошу не осуждать", reply_markup=markup2)
 
@@ -134,6 +138,8 @@ def users_list(call):
         conn.close()
 
         bot.send_message(call.message.chat.id, info)
+    elif call.data == "qwe":
+        admin_author_step1(call.message)
 
 
 @bot.message_handler(commands=["AdminPanel"])
@@ -146,8 +152,7 @@ def admin_author_step2(*args):
     message = args[0]
     admin_name = message.text.strip()
     bot.send_message(message.chat.id, "Введите Пароль")
-    bot.send_message(message.chat.id, message.text)
-    bot.register_next_step_handler(message, admin_author_step2, admin_name)
+    bot.register_next_step_handler(message, admin_author_last, admin_name)
 
 
 def admin_author_last(*info):
@@ -156,10 +161,13 @@ def admin_author_last(*info):
     global authorized
     global admin_secure
     global admin_mode
-    if message.text == admin_secure[1] and admin_name == admin_secure[2]:
+    if message.text == admin_secure[1] and admin_name == admin_secure[0]:
         bot.send_message(message.chat.id, "Вы в режиме администратора")
         admin_mode = True
         authorized = True
+    else:
+        bot.send_message(message.chat.id, "Бан")
+        bot.send_message(message.chat.id, f"{message.text}{admin_secure[0]}   {admin_name}{admin_secure[1]}")
 
 
 @bot.message_handler(commands=["калуга"])
@@ -219,7 +227,26 @@ def start_button(message):
 # @bot.callback_query_handler(func=lambda callback: True)
 # def callback_mess(callback):
 #     if callback.data == "LOL":
-#         bot.delete_message(callback.message.chat.id, callback.message.message_id - 1) qqe
+#         bot.delete_message(callback.message.chat.id, callback.message.message_id - 1)
+@bot.message_handler(commands=["dnd"])
+def dnd(message):
+    global admin_mode
+    if admin_mode:
+        bot.reply_to(message, "Выгружаю файл смерти")
+        dnd_video_meme = open("./dimka.mp4", "rb")
+        bot.send_video(message.chat.id, dnd_video_meme)
+    else:
+        markup = types.InlineKeyboardMarkup()
+        markup.row(types.InlineKeyboardButton("Войти в режим админа", callback_data="qwe"))
+        bot.send_message(message.chat.id, f"Вы не админ", reply_markup=markup)
+
+
+# @bot.callback_query_handler(func=lambda cal: True)
+# def not_adm_call(cal):
+#     if cal.data == "qwe":
+#         bot.send_message(cal.message.chat.id, f"лох")
+#         admin_author_step1(cal)
+
 
 @bot.message_handler()
 def otvet(message):
