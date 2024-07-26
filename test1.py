@@ -10,7 +10,8 @@ bot_api = open("telebotapi").readline()
 bot = telebot.TeleBot(bot_api)
 weather_api = "9f09b90a765e2eb2b66de333e081e988"
 
-url = "https://rp5.ru/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%9A%D0%B0%D0%BB%D1%83%D0%B3%D0%B5,_%D0%9A%D0%B0%D0%BB%D1%83%D0%B6%D1%81%D0%BA%D0%B0%D1%8F_%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C"
+url = ("https://rp5.ru/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%9A%D0%B0%D0%BB%D1%83%D0%B3%D0%B5,_%D0%9A%D0%"
+       "B0%D0%BB%D1%83%D0%B6%D1%81%D0%BA%D0%B0%D1%8F_%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C")
 r = requests.get(url)
 html = BS(r.text, 'html.parser')
 t1 = html.find(class_='round-5').find(id='forecastShort-content').text
@@ -211,6 +212,7 @@ def weather_start(message):
 
 
 def weather_end(message):
+    global weather_api
     city = message.text.strip().lower()
     weather_city = requests.get(
         f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={weather_api}&units=metric")
