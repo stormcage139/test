@@ -1,9 +1,9 @@
 import telebot
 from telebot import types
-import webbrowser
 import sqlite3
-import requests, json
+import requests
 from bs4 import BeautifulSoup as BS
+import json
 
 # Use your telegtrambotAPI
 bot_api = open("telebotapi").readline()
@@ -270,11 +270,30 @@ def dnd(message):
         bot.send_message(message.chat.id, f"Вы не админ", reply_markup=markup)
 
 
-# @bot.callback_query_handler(func=lambda cal: True)
-# def not_adm_call(cal):
-#     if cal.data == "qwe":
-#         bot.send_message(cal.message.chat.id, f"лох")
-#         admin_author_step1(cal)
+@bot.message_handler(commands=["food"])
+def food(message):
+    send_products_info_message = ""
+    with open("food_data/all_categories_dict.json") as file:
+        all_categories = json.load(file)
+    for count, i in enumerate(all_categories):
+        send_products_info_message += f"{count} {i}\n"
+    bot.send_message(message.chat.id, send_products_info_message)
+    bot.send_message(message.chat.id, "Напишите что вас интересует(число)")
+    bot.register_next_step_handler(message, meal)
+
+
+def meal(message):
+    global category_name
+    with open("food_data/all_categories_dict.json") as file:
+        all_categories = list(json.load(file))
+    count = 0
+    will_replace = [",", " ", "-"]
+    for count, item in enumerate(will_replace):
+        if item in all_categories[int(message.text)]:
+            all_categories[int(message.text)] = all_categories[int(message.text)].replace(item, "_")
+            pass
+    csv_finder = f"{message.text}_{all_categories[int(message.text)]}"
+    bot.send_document(message.chat.id, open(f"food_data/{csv_finder}.csv", 'rb'))
 
 
 @bot.message_handler()
